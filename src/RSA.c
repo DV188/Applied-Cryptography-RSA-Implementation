@@ -7,7 +7,11 @@
  */
 
 #include <stdio.h>
-#include <gmp.h> //GNU Multiple Precision Arithmetic Library(https://gmplib.org/), used for big numbers.
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include "miller-rabin.h" 
 
 //Struct Definitions
 
@@ -19,6 +23,25 @@ typedef struct public_key {
 
 //Function Prototypes
 
+public_key set_public_key(const char *str_n, const char *str_e);
+void generate_prime(mpz_t p, int prime_size);
+
+int main(int arc, char *argv[]) {
+    mpz_t p;
+    generate_prime(p, 512);
+
+    gmp_printf("Prime = %Zd\n", p);
+    return 0;
+}
+
+/*
+ * Creates a public key used for asymmetric cryptography.
+ * Parameters:
+ *      str_n - string value representing n, the RSA modulus
+ *      str_e - string value resprsenting e, the RSA private exponent
+ * Returns:
+ *      k_pu - struct representation of the RSA public key
+ */
 public_key set_public_key(const char *str_n, const char *str_e) {
     public_key k_pu;
 
@@ -33,10 +56,32 @@ public_key set_public_key(const char *str_n, const char *str_e) {
     return(k_pu);
 }
 
-int main(int arc, char *argv[]) {
-    public_key k_pu = set_public_key("123", "456");
+/*
+ * Creates a prime number using the Miller-Rabin primality test.
+ * Parameters:
+ *      p - empty value for p, generate_prime saves its value to this variable
+ *          p represents a large prime number to be used with RSA's n = pq
+ *      prime_size - size of prime in bits, 512 is typical for an RSA modulus of 1024 bits
+ * Returns:
+ *      p - the input parameter p is also where this function stores the value returned
+ */
+void generate_prime(mpz_t p, int prime_size) {
+    mpz_t max, two;
 
-    gmp_printf("n = %Zd, e = %Zd\n", k_pu.n, k_pu.e);
+    gmp_randstate_t rand_state;
+    gmp_randinit_default(rand_state);
+    gmp_randseed_ui (rand_state, time(NULL));
 
-    return(0);
+    mpz_init(max);
+    mpz_init_set_ui(two, 2);
+    mpz_mul_2exp(max, two, prime_size + 1);
+    mpz_init(p);
+
+    do {
+        mpz_urandomm(p, rand_state, max);
+        if (mpz_even_p(p)) continue;
+        if (mpz_fdiv_ui(p, 3) == 0) continue;
+        if (mpz_fdiv_ui(p, 5) == 0) continue;
+        if (mpz_fdiv_ui(p, 7) == 0) continue;
+    } while (miller_rabin(p, rand_state) == COMPOSITE);
 }

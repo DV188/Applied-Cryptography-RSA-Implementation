@@ -1,0 +1,24 @@
+Implementation Project
+----------------------
+
+For this project, you will implement something real.  Your implementation has
+to work with real sized data (thousands of bits or example) and it should be
+correct.
+
+Proposal: Your proposal should describe what you are implementing and also
+provide a short overview of it.  (What is it used for, what actual problem is
+it used to solve, who/where was it invented, etc).  You must include references
+to relevant sources such as standards specifications for the system, other
+implementations (that are freely available), etc. Your proposal should be at
+least two pages (but not significantly more).
+
+Demo: In the last week of classes, you will demo your code.  You'll be expected
+to run your code and answer questions about it. If you work in a team, all
+members are expected to be present and all members will be asked about
+different aspects of the code.
+
+Potential topics: Implement a secure version of RSA (using OAEP padding,
+Chinese Remainding for decryption, good creation of primes) and some variants
+of RSA (and compare the efficiency of the variants), implement a secure online
+voting system, implement bitcoin, etc.  Note, the work involved should be
+comparable to the Paper/Presentation project.
