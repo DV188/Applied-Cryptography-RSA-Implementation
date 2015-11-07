@@ -25,14 +25,27 @@ typedef struct public_key {
 
 public_key set_public_key(const char *str_n, const char *str_e);
 void generate_prime(mpz_t p, int prime_size);
+int validate_e(mpz_t p, mpz_t q, int prime_size);
+
+//Main
 
 int main(int arc, char *argv[]) {
-    mpz_t p;
-    generate_prime(p, 512);
+    int prime_size = 512;
 
-    gmp_printf("Prime = %Zd\n", p);
+    mpz_t p;
+    mpz_t q;
+
+    generate_prime(p, prime_size);
+    generate_prime(q, prime_size);
+
+    gmp_printf("p = %Zd, q = %Zd\n", p, q);
+
+    validate_e(p, q, prime_size);
+
     return 0;
 }
+
+//Functions
 
 /*
  * Creates a public key used for asymmetric cryptography.
@@ -84,4 +97,40 @@ void generate_prime(mpz_t p, int prime_size) {
         if (mpz_fdiv_ui(p, 5) == 0) continue;
         if (mpz_fdiv_ui(p, 7) == 0) continue;
     } while (miller_rabin(p, rand_state) == COMPOSITE);
+}
+
+/*
+ * Validation of e must be performed to make sure our primes have been created correctly.
+ * Parameters:
+ *      p - prime number generated randomly
+ *      q - prime number generated randomly
+ *      prime_size - size of the prime in bits, must be the same as p and q
+ * Returns:
+ *      Returns 1 if function completes.
+ *      If p and q do not properly validate, p and q will be changed.
+ */
+int validate_e(mpz_t p, mpz_t q, int prime_size) {
+    mpz_t e;
+    mpz_t gcd;
+    mpz_t lcm;
+
+    mpz_init(gcd);
+    mpz_init(lcm);
+
+    mpz_init_set_ui(e, 65537);
+
+    mpz_lcm(lcm, p, q);
+    mpz_gcd(gcd, e, lcm);
+
+    while (mpz_get_ui(gcd) != 1) {
+        generate_prime(p, prime_size);
+        generate_prime(q, prime_size);
+
+        mpz_lcm(lcm, p, q);
+        mpz_gcd(gcd, e, lcm);
+
+        printf("Generating new primes.\n");
+    }
+
+    return(1);
 }
