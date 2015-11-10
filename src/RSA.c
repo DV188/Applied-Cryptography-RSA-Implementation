@@ -30,16 +30,18 @@ typedef struct private_key {
     mpz_t q; //Second factor, a positive integer.
     mpz_t dP; //First factor CRT exponent, positive integer.
     mpz_t dQ; //Second factor CRT exponent, positive integer.
-    mpz_t dInv; //(first) CRT exponent, positive integer.
+    mpz_t qInv; //(first) CRT exponent, positive integer.
 } private_key;
 
 //Function Prototypes
 
 public_key set_public_key(mpz_t n, mpz_t e);
+private_key set_private_key(mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t qInv);
 void print_public_key(public_key k_pu);
 void generate_prime(mpz_t p, int prime_size);
 int validate_e(mpz_t p, mpz_t q, int prime_size);
-int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t pq_minus_1);
+int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t prime);
+public_key generate_public_key(mpz_t p, mpz_t q, mpz_t e, int prime_size);
 
 //Main
 
@@ -50,27 +52,13 @@ int main(int arc, char *argv[]) {
 
     mpz_init(p);
     mpz_init(q);
-    mpz_init(n);
-    mpz_init(dP);
 
-    mpz_init_set_ui(e, 65537);
+    // mpz_init_set_ui(e, 65537);
+    mpz_init_set_ui(e, 17);
 
-    generate_prime(p, prime_size);
-    generate_prime(q, prime_size);
-
-    mpz_mul(n, p, q);
-
-    k_pu = set_public_key(n, e);
-
-    gmp_printf("p = %Zd, q = %Zd\n", p, q);
-
-    validate_e(p, q, prime_size);
+    k_pu = generate_public_key(p, q, e, 512);
 
     print_public_key(k_pu);
-
-    int rc = multiplicative_inverse(dP, e, p - 1);
-
-    gmp_printf("%d: %Zd\n", rc, dP);
 
     return 0;
 }
@@ -80,8 +68,8 @@ int main(int arc, char *argv[]) {
 /*
  * Creates a public key used for asymmetric cryptography.
  * Parameters:
- *      str_n - string value representing n, the RSA modulus
- *      str_e - string value resprsenting e, the RSA private exponent
+ *      n - mpz_t value representing n, the RSA modulus
+ *      e - mpz_t value resprsenting e, the RSA private exponent
  * Returns:
  *      k_pu - struct representation of the RSA public key
  */
@@ -92,11 +80,42 @@ public_key set_public_key(mpz_t n, mpz_t e) {
     mpz_init(k_pu.n);
     mpz_init(k_pu.e);
 
-    //Assign str_* to * of the public key in base 10;
+    //Assign mpz_t to key.
     mpz_set(k_pu.n, n);
     mpz_set(k_pu.e, e);
 
     return(k_pu);
+}
+
+/*
+ * Creates a private key used for asymmetric cryptography.
+ * Parameters:
+ *      p - first factor of the RSA private key
+ *      q - second factor of the RSA private key
+ *      dP - first factor CRT exponent of the RSA private key
+ *      dQ - second factor CRT exponent of the RSA private key
+ *      qInv - CRT coefficient of the RSA private key
+ * Returns:
+ *      k_pr - struct representation of the RSA private key using CRT
+ */
+private_key set_private_key(mpz_t p, mpz_t q, mpz_t dP, mpz_t dQ, mpz_t qInv) {
+    private_key k_pr;
+
+    //Initialize values of the private key to 0.
+    mpz_init(k_pr.p);
+    mpz_init(k_pr.q);
+    mpz_init(k_pr.dP);
+    mpz_init(k_pr.dQ);
+    mpz_init(k_pr.qInv);
+
+    //Assign mpz_t to key.
+    mpz_set(k_pr.p, p);
+    mpz_set(k_pr.q, q);
+    mpz_set(k_pr.dP, dP);
+    mpz_set(k_pr.dQ, dQ);
+    mpz_set(k_pr.qInv, qInv);
+
+    return(k_pr);
 }
 
 /*
@@ -179,10 +198,30 @@ int validate_e(mpz_t p, mpz_t q, int prime_size) {
  * Parameters:
  *      result - where the result is stored
  *      exponent - public key exponent
- *      pq_minus_1 - the value of prime p - 1
+ *      prime - the value of a prime, usually - 1
  * Returns:
  *      Returns 0 if functions cannot be inverted.
  */
-int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t pq_minus_1) {
-    return(mpz_invert(result, exponent, pq_minus_1));
+int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t prime) {
+    return(mpz_invert(result, exponent, prime));
+}
+
+public_key generate_public_key(mpz_t p, mpz_t q, mpz_t e, int prime_size) {
+    int return_code = 1;
+    mpz_t n;
+    public_key k_pu;
+
+    generate_prime(p, prime_size);
+    generate_prime(q, prime_size);
+
+    return_code = validate_e(p, q, prime_size);
+    if (!return_code)
+        printf("The public key exponent 'e' could not be validated.\n");
+
+    mpz_init(n);
+    mpz_mul(n, p, q);
+
+    k_pu = set_public_key(n, e);
+
+    return(k_pu);
 }
