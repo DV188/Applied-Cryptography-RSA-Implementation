@@ -11,61 +11,37 @@
 #include <string.h>
 #include <time.h>
 
+#include "RSA.h" 
 #include "miller-rabin.h" 
-
-#define exponent_e
-
-//Struct Definitions
-
-//Struct representation of a public key used for asynchronous cryptography
-typedef struct public_key {
-    mpz_t n; //RSA modulus, a positive integer.
-    mpz_t e; //RSA public exponent, a positive integer.
-} public_key;
-
-//Struct representation of a private key used for asynchronous cryptography
-//Chinese Remainder Theorem is used.
-typedef struct private_key {
-    mpz_t p; //First factor, a positive integer.
-    mpz_t q; //Second factor, a positive integer.
-    mpz_t dP; //First factor CRT exponent, positive integer.
-    mpz_t dQ; //Second factor CRT exponent, positive integer.
-    mpz_t qInv; //(first) CRT exponent, positive integer.
-} private_key;
-
-//Function Prototypes
-
-public_key set_public_key(const mpz_t n, const mpz_t e);
-private_key set_private_key(const mpz_t p, const mpz_t q, const mpz_t dP, const mpz_t dQ, const mpz_t qInv);
-void print_public_key(public_key k_pu);
-void print_private_key(private_key k_pr);
-void generate_prime(mpz_t p, int prime_size);
-int validate_e(const mpz_t e, mpz_t p, mpz_t q, int prime_size);
-int multiplicative_inverse(mpz_t result, const mpz_t exponent, const mpz_t prime);
-public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size);
-private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e);
 
 //Main
 
 int main(int arc, char *argv[]) {
     int prime_size = 512;
-    mpz_t p, q, e;
+    mpz_t p, q, e, m, c;
     public_key k_pu;
     private_key k_pr;
 
     mpz_init(p);
     mpz_init(q);
+    mpz_init(c);
+    mpz_init_set_str(m, "4276807876587964144954784127658184817737000319649715500324859954620945413181720716996786335261908310006130314643005418488822520739896308020449922303", 10);
 
     mpz_init_set_ui(e, 65537);
 
     k_pu = generate_public_key(p, q, e, 512);
-
-    gmp_printf("///////\n%Zd\n%Zd\n/////////\n", p, q);
-
     k_pr = generate_private_key(p, q, e);
 
     print_public_key(k_pu);
     print_private_key(k_pr);
+
+    gmp_printf("\n%Zd\n", m);
+
+    RSAEP(c, m, k_pu);
+    gmp_printf("\n%Zd\n", c);
+
+    RSADP(m, c, k_pr);
+    gmp_printf("\n%Zd\n", m);
 
     return 0;
 }
@@ -131,7 +107,7 @@ private_key set_private_key(const mpz_t p, const mpz_t q, const mpz_t dP, const 
  *      k_pu - struct public_key representing the public key
  */
 void print_public_key(public_key k_pu) {
-    gmp_printf("Public Key: (%Zd, %Zd)\n", k_pu.n, k_pu.e);
+    gmp_printf("Public Key:\n(%Zd,\n %Zd)\n", k_pu.n, k_pu.e);
 }
 
 /*
@@ -140,7 +116,7 @@ void print_public_key(public_key k_pu) {
  *      k_pr - struct private_key representing the private key.
  */
 void print_private_key(private_key k_pr) {
-    gmp_printf("Private Key: \n(%Zd,\n %Zd,\n %Zd,\n %Zd,\n %Zd)\n", k_pr.p, k_pr.q, k_pr.dP, k_pr.dQ, k_pr.qInv);
+    gmp_printf("Private Key:\n(%Zd,\n %Zd,\n %Zd,\n %Zd,\n %Zd)\n", k_pr.p, k_pr.q, k_pr.dP, k_pr.dQ, k_pr.qInv);
 }
 
 /*
@@ -293,4 +269,38 @@ private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e) {
     k_pr = set_private_key(p, q, dP, dQ, qInv);
 
     return(k_pr);
+}
+
+void RSAEP(mpz_t c,  const mpz_t m, const public_key k_pu) {
+    if (mpz_cmp(m, k_pu.n) > 0)
+        printf("Message representative out of range.\n");
+
+    mpz_powm(c, m, k_pu.e, k_pu.n);
+}
+
+void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
+    mpz_t n, m_1, m_2, h, h_1, h_2, h_3;
+    mpz_init(n);
+    mpz_init(m_1);
+    mpz_init(m_2);
+    mpz_init(h);
+    mpz_init(h_1);
+    mpz_init(h_2);
+    mpz_init(h_3);
+
+    mpz_mul(n, k_pr.q, k_pr.p);
+
+    if (mpz_cmp(c, n) > 0)
+        printf("Ciphertext representative out of range.\n");
+
+    
+    mpz_powm(m_1, c, k_pr.dP, k_pr.p);
+    mpz_powm(m_2, c, k_pr.dQ, k_pr.q);
+
+    mpz_sub(h_1, m_1, m_2);
+    mpz_powm_ui(h_2, k_pr.qInv, 1, k_pr.p);
+    mpz_mul(h, h_1, h_2);
+
+    mpz_mul(h_3, k_pr.q, h);
+    mpz_add(m, m_2, h_3);
 }
