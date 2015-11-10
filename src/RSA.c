@@ -38,8 +38,9 @@ typedef struct private_key {
 public_key set_public_key(const mpz_t n, const mpz_t e);
 private_key set_private_key(const mpz_t p, const mpz_t q, const mpz_t dP, const mpz_t dQ, const mpz_t qInv);
 void print_public_key(public_key k_pu);
+void print_private_key(private_key k_pr);
 void generate_prime(mpz_t p, int prime_size);
-int validate_e(mpz_t p, mpz_t q, int prime_size);
+int validate_e(const mpz_t e, mpz_t p, mpz_t q, int prime_size);
 int multiplicative_inverse(mpz_t result, const mpz_t exponent, const mpz_t prime);
 public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size);
 private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e);
@@ -48,18 +49,23 @@ private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e);
 
 int main(int arc, char *argv[]) {
     int prime_size = 512;
-    mpz_t e, p, q, n, dP;
+    mpz_t p, q, e;
     public_key k_pu;
+    private_key k_pr;
 
     mpz_init(p);
     mpz_init(q);
 
-    // mpz_init_set_ui(e, 65537);
-    mpz_init_set_ui(e, 17);
+    mpz_init_set_ui(e, 65537);
 
     k_pu = generate_public_key(p, q, e, 512);
 
+    gmp_printf("///////\n%Zd\n%Zd\n/////////\n", p, q);
+
+    k_pr = generate_private_key(p, q, e);
+
     print_public_key(k_pu);
+    print_private_key(k_pr);
 
     return 0;
 }
@@ -129,6 +135,15 @@ void print_public_key(public_key k_pu) {
 }
 
 /*
+ * Prints the private key to std out.
+ * Parameters:
+ *      k_pr - struct private_key representing the private key.
+ */
+void print_private_key(private_key k_pr) {
+    gmp_printf("Private Key: \n(%Zd,\n %Zd,\n %Zd,\n %Zd,\n %Zd)\n", k_pr.p, k_pr.q, k_pr.dP, k_pr.dQ, k_pr.qInv);
+}
+
+/*
  * Creates a prime number using the Miller-Rabin primality test.
  * Parameters:
  *      p - empty value for p, generate_prime saves its value to this variable
@@ -168,15 +183,12 @@ void generate_prime(mpz_t p, int prime_size) {
  *      Returns 1 if function completes.
  *      If p and q do not properly validate, p and q will be changed.
  */
-int validate_e(mpz_t p, mpz_t q, int prime_size) {
-    mpz_t e;
+int validate_e(const mpz_t e, mpz_t p, mpz_t q, int prime_size) {
     mpz_t gcd;
     mpz_t lcm;
 
     mpz_init(gcd);
     mpz_init(lcm);
-
-    mpz_init_set_ui(e, 65537);
 
     mpz_lcm(lcm, p, q);
     mpz_gcd(gcd, e, lcm);
@@ -184,6 +196,9 @@ int validate_e(mpz_t p, mpz_t q, int prime_size) {
     while (mpz_get_ui(gcd) != 1) {
         generate_prime(p, prime_size);
         generate_prime(q, prime_size);
+
+        while (mpz_cmp(p, q) == 0)
+            generate_prime(q, prime_size);
 
         mpz_lcm(lcm, p - 1, q - 1);
         mpz_gcd(gcd, e, lcm);
@@ -212,7 +227,7 @@ int multiplicative_inverse(mpz_t result, const mpz_t exponent, const mpz_t prime
  * Parameters:
  *      p - initialized mpz_t value where prime p will be stored
  *      q - initialized mpz_t value where prime q will be stored
- *      q - initialized and set mpz_t value for public exponent e
+ *      e - initialized and set mpz_t value for public exponent e
  *      prime_size - size of the primes to be generated, usually 512 - 1024 bits
  * Returns:
  *      k_pu - public key for RSA
@@ -225,7 +240,10 @@ public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size) 
     generate_prime(p, prime_size);
     generate_prime(q, prime_size);
 
-    return_code = validate_e(p, q, prime_size);
+    while (mpz_cmp(p, q) == 0)
+        generate_prime(q, prime_size);
+
+    return_code = validate_e(e, p, q, prime_size);
     if (!return_code)
         printf("The public key exponent 'e' could not be validated.\n");
 
@@ -237,24 +255,38 @@ public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size) 
     return(k_pu);
 }
 
+/*
+ * Generates a private key for key generation in RSA.
+ * Parameters:
+ *      p - initialized mpz_t value prime p
+ *      q - initialized mpz_t value prime q
+ *      e - initialized mpz_t value exponent e
+ * Returns:
+ *      k_pr - private key for RSA
+ */
 private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e) {
-    mpz_t dP, dQ, qInv;
+    mpz_t dP, dQ, qInv, p_minus_1, q_minus_1;
     int return_code = 1;
     private_key k_pr;
 
     mpz_init(dP);
     mpz_init(dQ);
     mpz_init(qInv);
+    mpz_init(p_minus_1);
+    mpz_init(q_minus_1);
 
-    return_code = multiplicative_inverse(dP, e, (p - 1));
+    mpz_sub_ui(p_minus_1, p, 1);
+    mpz_sub_ui(q_minus_1, q, 1);
+
+    return_code = multiplicative_inverse(dP, e, p_minus_1);
     if (!return_code)
         printf("Error inversing 'dP'.\n");
 
-    return_code = multiplicative_inverse(dQ, e, (q - 1));
+    return_code = multiplicative_inverse(dQ, e, q_minus_1);
     if (!return_code)
         printf("Error inversing 'dQ'.\n");
 
-    return_code = multiplicative_inverse(qInv, e, p);
+    return_code = multiplicative_inverse(qInv, q, p);
     if (!return_code)
         printf("Error inversing 'qInv'.\n");
 
