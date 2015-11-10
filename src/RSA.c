@@ -13,6 +13,8 @@
 
 #include "miller-rabin.h" 
 
+#define exponent_e
+
 //Struct Definitions
 
 //Struct representation of a public key used for asynchronous cryptography
@@ -21,26 +23,54 @@ typedef struct public_key {
     mpz_t e; //RSA public exponent, a positive integer.
 } public_key;
 
+//Struct representation of a private key used for asynchronous cryptography
+//Chinese Remainder Theorem is used.
+typedef struct private_key {
+    mpz_t p; //First factor, a positive integer.
+    mpz_t q; //Second factor, a positive integer.
+    mpz_t dP; //First factor CRT exponent, positive integer.
+    mpz_t dQ; //Second factor CRT exponent, positive integer.
+    mpz_t dInv; //(first) CRT exponent, positive integer.
+} private_key;
+
 //Function Prototypes
 
-public_key set_public_key(const char *str_n, const char *str_e);
+public_key set_public_key(mpz_t n, mpz_t e);
+void print_public_key(public_key k_pu);
 void generate_prime(mpz_t p, int prime_size);
 int validate_e(mpz_t p, mpz_t q, int prime_size);
+int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t pq_minus_1);
 
 //Main
 
 int main(int arc, char *argv[]) {
     int prime_size = 512;
+    mpz_t e, p, q, n, dP;
+    public_key k_pu;
 
-    mpz_t p;
-    mpz_t q;
+    mpz_init(p);
+    mpz_init(q);
+    mpz_init(n);
+    mpz_init(dP);
+
+    mpz_init_set_ui(e, 65537);
 
     generate_prime(p, prime_size);
     generate_prime(q, prime_size);
 
+    mpz_mul(n, p, q);
+
+    k_pu = set_public_key(n, e);
+
     gmp_printf("p = %Zd, q = %Zd\n", p, q);
 
     validate_e(p, q, prime_size);
+
+    print_public_key(k_pu);
+
+    int rc = multiplicative_inverse(dP, e, p - 1);
+
+    gmp_printf("%d: %Zd\n", rc, dP);
 
     return 0;
 }
@@ -55,7 +85,7 @@ int main(int arc, char *argv[]) {
  * Returns:
  *      k_pu - struct representation of the RSA public key
  */
-public_key set_public_key(const char *str_n, const char *str_e) {
+public_key set_public_key(mpz_t n, mpz_t e) {
     public_key k_pu;
 
     //Initialize values of the public key to 0.
@@ -63,10 +93,19 @@ public_key set_public_key(const char *str_n, const char *str_e) {
     mpz_init(k_pu.e);
 
     //Assign str_* to * of the public key in base 10;
-    mpz_set_str(k_pu.n, str_n, 10);
-    mpz_set_str(k_pu.e, str_e, 10);
+    mpz_set(k_pu.n, n);
+    mpz_set(k_pu.e, e);
 
     return(k_pu);
+}
+
+/*
+ * Prints the public key to std out.
+ * Parameters:
+ *      k_pu - struct public_key representing the public key
+ */
+void print_public_key(public_key k_pu) {
+    gmp_printf("Public Key: (%Zd, %Zd)\n", k_pu.n, k_pu.e);
 }
 
 /*
@@ -126,11 +165,24 @@ int validate_e(mpz_t p, mpz_t q, int prime_size) {
         generate_prime(p, prime_size);
         generate_prime(q, prime_size);
 
-        mpz_lcm(lcm, p, q);
+        mpz_lcm(lcm, p - 1, q - 1);
         mpz_gcd(gcd, e, lcm);
 
         printf("Generating new primes.\n");
     }
 
     return(1);
+}
+
+/*
+ * Computes the multiplicative inverse of a private key.
+ * Parameters:
+ *      result - where the result is stored
+ *      exponent - public key exponent
+ *      pq_minus_1 - the value of prime p - 1
+ * Returns:
+ *      Returns 0 if functions cannot be inverted.
+ */
+int multiplicative_inverse(mpz_t result, mpz_t exponent, mpz_t pq_minus_1) {
+    return(mpz_invert(result, exponent, pq_minus_1));
 }
