@@ -20,27 +20,29 @@ int main(int arc, char *argv[]) {
     int prime_size = 512;
     mpz_t p, q, e, m, c;
     public_key k_pu;
-    private_key k_pr;
+    // private_key k_pr;
+    private_key_textbook k_pr;
 
     mpz_init(p);
     mpz_init(q);
     mpz_init(c);
-    mpz_init_set_str(m, "4276807876587964144954784127658184817737000319649715500324859954620945413181720716996786335261908310006130314643005418488822520739896308020449922303", 10);
+    mpz_init_set_str(m, "427680787658796414495478412765818481773700031964971550032485995462094541318172071699678633526190831000613031464300541848882252073989630802044992230370499993349891121354055409063481101792420859297579606741599372692821291104228771117776673746157967849667351681259816188574800065511460953723930836865732656293632", 10);
 
     mpz_init_set_ui(e, 65537);
 
     k_pu = generate_public_key(p, q, e, 512);
-    k_pr = generate_private_key(p, q, e);
+    // k_pr = generate_private_key(p, q, e);
+    k_pr = generate_private_key_textbook(p, q, e);
 
     print_public_key(k_pu);
-    print_private_key(k_pr);
+    print_private_key_textbook(k_pr);
 
     gmp_printf("\n%Zd\n", m);
 
     RSAEP(c, m, k_pu);
     gmp_printf("\n%Zd\n", c);
 
-    RSADP(m, c, k_pr);
+    RSADP_texbook(m, c, k_pr);
     gmp_printf("\n%Zd\n", m);
 
     return 0;
@@ -68,6 +70,28 @@ public_key set_public_key(const mpz_t n, const mpz_t e) {
     mpz_set(k_pu.e, e);
 
     return(k_pu);
+}
+
+/*
+ * Creates a private key used for asymmetric cryptography.
+ * Parameters:
+ *      n - modulous of the  RSA private key
+ *      d - private exponent of the  RSA private key
+ * Returns:
+ *      k_pr - struct representation of the RSA private key
+ */
+private_key_textbook set_private_key_texbook(const mpz_t n, const mpz_t d) {
+    private_key_textbook k_pr;
+
+    //Initialize values of the private key to 0.
+    mpz_init(k_pr.n);
+    mpz_init(k_pr.d);
+
+    //Assign mpz_t to key.
+    mpz_set(k_pr.n, n);
+    mpz_set(k_pr.d, d);
+
+    return(k_pr);
 }
 
 /*
@@ -117,6 +141,15 @@ void print_public_key(public_key k_pu) {
  */
 void print_private_key(private_key k_pr) {
     gmp_printf("Private Key:\n(%Zd,\n %Zd,\n %Zd,\n %Zd,\n %Zd)\n", k_pr.p, k_pr.q, k_pr.dP, k_pr.dQ, k_pr.qInv);
+}
+
+/*
+ * Prints the textbook private key to std out.
+ * Parameters:
+ *      k_pr - struct private_key representing the private key texbook.
+ */
+void print_private_key_textbook(private_key_textbook k_pr) {
+    gmp_printf("Private Key:\n(%Zd,\n %Zd)\n", k_pr.n, k_pr.d);
 }
 
 /*
@@ -238,6 +271,40 @@ public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size) 
  *      q - initialized mpz_t value prime q
  *      e - initialized mpz_t value exponent e
  * Returns:
+ *      k_pr - private key for textbook RSA
+ */
+private_key_textbook generate_private_key_textbook(const mpz_t p, const mpz_t q, const mpz_t e) {
+    mpz_t n, d, p_minus_1, q_minus_1, phi_n;
+    int return_code = 1;
+    private_key_textbook k_pr;
+
+    mpz_init(n);
+    mpz_init(d);
+    mpz_init(p_minus_1);
+    mpz_init(q_minus_1);
+    mpz_init(phi_n);
+
+    mpz_sub_ui(p_minus_1, p, 1);
+    mpz_sub_ui(q_minus_1, q, 1);
+
+    mpz_mul(phi_n, p_minus_1, q_minus_1);
+
+    mpz_mul(n, p, q);
+
+    multiplicative_inverse(d, e, phi_n);
+
+    k_pr = set_private_key_texbook(n, d);
+
+    return(k_pr);
+}
+
+/*
+ * Generates a private key for key generation in RSA.
+ * Parameters:
+ *      p - initialized mpz_t value prime p
+ *      q - initialized mpz_t value prime q
+ *      e - initialized mpz_t value exponent e
+ * Returns:
  *      k_pr - private key for RSA
  */
 private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e) {
@@ -271,6 +338,15 @@ private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e) {
     return(k_pr);
 }
 
+/*
+ * Runs the RSA primative RSAEP to encrypt a message using the public key.
+ * Parameters:
+ *      c - initialized ciphertext value that will be set to the ciphertext of the message m
+ *      m - initialized and set message to encrypt
+ *      k_pu - public key for RSA
+ * Returns:
+ *      Ciphertext for a message is returned in the mpz_t s variable.
+ */
 void RSAEP(mpz_t c,  const mpz_t m, const public_key k_pu) {
     if (mpz_cmp(m, k_pu.n) > 0)
         printf("Message representative out of range.\n");
@@ -278,6 +354,31 @@ void RSAEP(mpz_t c,  const mpz_t m, const public_key k_pu) {
     mpz_powm(c, m, k_pu.e, k_pu.n);
 }
 
+/*
+ * Runs the RSA primative RSADP to decrypt a message using the private key.
+ * Parameters:
+ *      m - initialized message to be the return value of the decrypted message
+ *      c - initialized and set ciphertext to decrypt
+ *      k_pr - private key for RSA texbook
+ * Returns:
+ *      Plaintext message is returned in the mpz_t value m.
+ */
+void RSADP_texbook(mpz_t m, const mpz_t c, const private_key_textbook k_pr) {
+    if (mpz_cmp(c, k_pr.n) > 0)
+        printf("Ciphertext representative out of range.\n");
+    
+    mpz_powm(m, c, k_pr.d, k_pr.n);
+}
+
+/*
+ * Runs the RSA primative RSADP to decrypt a message using the private key.
+ * Parameters:
+ *      m - initialized message to be the return value of the decrypted message
+ *      c - initialized and set ciphertext to decrypt
+ *      k_pr - private key for RSA using CRT
+ * Returns:
+ *      Plaintext message is returned in the mpz_t value m.
+ */
 void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
     mpz_t n, m_1, m_2, h, h_1, h_2, h_3;
     mpz_init(n);
