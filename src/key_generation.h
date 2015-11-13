@@ -52,6 +52,5 @@ private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e);
 
 void generate_prime(mpz_t p, int prime_size);
 int validate_e(const mpz_t e, mpz_t p, mpz_t q, int prime_size);
-int multiplicative_inverse(mpz_t result, const mpz_t exponent, const mpz_t prime);
 
 #endif

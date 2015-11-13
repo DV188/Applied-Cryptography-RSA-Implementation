@@ -176,7 +176,10 @@ private_key_textbook generate_private_key_textbook(const mpz_t p, const mpz_t q,
 
     mpz_mul(n, p, q);
 
-    multiplicative_inverse(d, e, phi_n);
+    return_code = mpz_invert(d, e, phi_n);
+
+    if (return_code == 0)
+        printf("Error inversing 'd'.\n");
 
     k_pr = set_private_key_texbook(n, d);
 
@@ -206,15 +209,15 @@ private_key generate_private_key(const mpz_t p, const mpz_t q, const mpz_t e) {
     mpz_sub_ui(p_minus_1, p, 1);
     mpz_sub_ui(q_minus_1, q, 1);
 
-    return_code = multiplicative_inverse(dP, e, p_minus_1);
+    return_code = mpz_invert(dP, e, p_minus_1);
     if (!return_code)
         printf("Error inversing 'dP'.\n");
 
-    return_code = multiplicative_inverse(dQ, e, q_minus_1);
+    return_code = mpz_invert(dQ, e, q_minus_1);
     if (!return_code)
         printf("Error inversing 'dQ'.\n");
 
-    return_code = multiplicative_inverse(qInv, q, p);
+    return_code = mpz_invert(qInv, q, p);
     if (!return_code)
         printf("Error inversing 'qInv'.\n");
 
@@ -287,17 +290,4 @@ int validate_e(const mpz_t e, mpz_t p, mpz_t q, int prime_size) {
     }
 
     return(1);
-}
-
-/*
- * Computes the multiplicative inverse of a private key.
- * Parameters:
- *      result - where the result is stored
- *      exponent - public key exponent
- *      prime - the value of a prime, usually - 1
- * Returns:
- *      Returns 0 if functions cannot be inverted.
- */
-int multiplicative_inverse(mpz_t result, const mpz_t exponent, const mpz_t prime) {
-    return(mpz_invert(result, exponent, prime));
 }
