@@ -27,7 +27,7 @@ void test_RSA_textbook(void) {
 
     mpz_init_set_ui(e, 65537);
 
-    k_pu = generate_public_key(p, q, e, 512);
+    k_pu = generate_public_key(p, q, e, prime_size);
     // k_pr = generate_private_key(p, q, e);
     k_pr = generate_private_key_textbook(p, q, e);
 
