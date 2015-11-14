@@ -15,7 +15,8 @@
 //Main
 
 int main(int arc, char *argv[]) {
-    test_RSA_textbook();
+    // test_RSA_textbook();
+    test_RSA();
 
     return 0;
 }
@@ -83,8 +84,8 @@ void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
     mpz_powm(m_2, c, k_pr.dQ, k_pr.q);
 
     mpz_sub(h_1, m_1, m_2);
-    mpz_powm_ui(h_2, k_pr.qInv, 1, k_pr.p);
-    mpz_mul(h, h_1, h_2);
+    mpz_mul(h_2, h_1, k_pr.qInv);
+    mpz_powm_ui(h, h_2, 1, k_pr.p);
 
     mpz_mul(h_3, k_pr.q, h);
     mpz_add(m, m_2, h_3);

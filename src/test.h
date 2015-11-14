@@ -10,5 +10,6 @@
 #define TEST_H
 
 void test_RSA_textbook(void);
+void test_RSA(void);
 
 #endif
