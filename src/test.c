@@ -13,6 +13,7 @@
 #include "key_generation.h" 
 #include "test.h" 
 
+// This function is used to test textbook RSA.
 void test_RSA_textbook(void) {
     int prime_size = 513;
     mpz_t p, q, e, m, c;
@@ -41,6 +42,7 @@ void test_RSA_textbook(void) {
     gmp_printf("\n%Zd\n", m);
 }
 
+// This function is used to test RSA.
 void test_RSA(void) {
     int prime_size = 513;
     mpz_t p, q, e, m, c;
