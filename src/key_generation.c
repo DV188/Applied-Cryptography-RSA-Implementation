@@ -134,12 +134,6 @@ public_key generate_public_key(mpz_t p, mpz_t q, const mpz_t e, int prime_size) 
     generate_prime(p, prime_size);
     generate_prime(q, prime_size);
 
-    while (mpz_sizeinbase(p, 2) != prime_size)
-        generate_prime(p, prime_size);
-
-    while (mpz_sizeinbase(q, 2) != prime_size)
-        generate_prime(q, prime_size);
-
     while (mpz_cmp(p, q) == 0)
         generate_prime(q, prime_size);
 

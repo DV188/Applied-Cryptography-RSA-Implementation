@@ -20,7 +20,7 @@ void RSAES_OAEP_encrypt(
         int label_octet_string_length);
 
 void RSAES_OAEP_decrypt(
-        unsigned int message_octet_string[],
+        mpz_t message,
         private_key k_pr,
         unsigned int ciphertext_octet_string[],
         int ciphertext_octet_string_length,

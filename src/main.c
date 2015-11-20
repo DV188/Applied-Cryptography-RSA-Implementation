@@ -19,11 +19,9 @@ int main(int arc, char *argv[]) {
     unsigned int length = mpz_sizeinbase(i, 10);
     unsigned int octet_string[length];
     unsigned int ciphertext_octet_string[1000];
-    unsigned int message_octet_string[length];
 
     memset(octet_string, 0, sizeof(octet_string));
     memset(ciphertext_octet_string, 0, sizeof(ciphertext_octet_string));
-    memset(message_octet_string, 0, sizeof(message_octet_string));
 
     I2OSP(octet_string, i, length);
 
@@ -42,7 +40,9 @@ int main(int arc, char *argv[]) {
     k_pr = generate_private_key(p, q, e);
 
     RSAES_OAEP_encrypt(ciphertext_octet_string, k_pu, octet_string, length, octet_string, length);
-    RSAES_OAEP_decrypt(message_octet_string, k_pr, ciphertext_octet_string, mpz_sizeinbase(k_pu.n, 10), octet_string, 310);
+    RSAES_OAEP_decrypt(m, k_pr, ciphertext_octet_string, mpz_sizeinbase(k_pu.n, 10), octet_string, 310);
+
+    gmp_printf("%Zd\n", m);
 }
 
 // int main(int arc, char *argv[]) {

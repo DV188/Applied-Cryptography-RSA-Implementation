@@ -85,17 +85,16 @@ void RSAES_OAEP_encrypt(
 }
 
 void RSAES_OAEP_decrypt(
-        unsigned int message_octet_string[],
+        mpz_t message,
         private_key k_pr,
         unsigned int ciphertext_octet_string[],
         int ciphertext_octet_string_length,
         unsigned int label_octet_string[],
         int label_octet_string_length) {
 
-    mpz_t n, c, m;
+    mpz_t n, c;
     mpz_init(n);
     mpz_init(c);
-    mpz_init(m);
 
     mpz_mul(n, k_pr.p, k_pr.q);
 
@@ -120,9 +119,7 @@ void RSAES_OAEP_decrypt(
     //RSA Decryption
     OS2IP(c, ciphertext_octet_string, ciphertext_octet_string_length);
 
-    RSADP(m, c, k_pr);
-
-    gmp_printf("%Zd\n", m);
+    RSADP(message, c, k_pr);
 }
 
 void SHA1(mpz_t label_hash, unsigned int octet_string[]) {
