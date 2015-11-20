@@ -9,12 +9,16 @@
 #ifndef OAEP_H
 #define OAEP_H
 
-#include <gmp.h>
 #include "key_generation.h" 
 
-unsigned int RSAEP_OAEP_encrypt(
+void RSAEP_OAEP_encrypt(
+        unsigned int ciphertext_octet_string[],
         public_key k_pu,
-        unsigned int *message_octet_string,
-        unsigned int *label_octet_string);
+        unsigned int message_octet_string[],
+        int message_octet_string_length,
+        unsigned int label_octet_string[],
+        int label_octet_string_length);
+
+void SHA1(mpz_t label_hash, unsigned int octet_string[]);
 
 #endif

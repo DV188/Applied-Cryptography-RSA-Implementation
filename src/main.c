@@ -14,11 +14,14 @@
 
 int main(int arc, char *argv[]) {
     mpz_t i;
-    mpz_init_set_str(i, "505653012503429218243943633705672380046318162980074400525290686010978535210508251025371556786334751948415457926276892598751961027794016968235973613925881804782472056690499897096340749266251887257171654630228493856549694979043602485084236106517977998198816346622004351187096835097200490691844506811161067102443", 10);
+    mpz_init_set_str(i, "505653012503429218243943633705672380046318162980074400", 10);
 
     unsigned int length = mpz_sizeinbase(i, 10);
     unsigned int octet_string[length];
+    unsigned int ciphertext_octet_string[1000];
+
     memset(octet_string, 0, sizeof(octet_string));
+    memset(ciphertext_octet_string, 0, sizeof(ciphertext_octet_string));
 
     I2OSP(octet_string, i, length);
 
@@ -33,7 +36,7 @@ int main(int arc, char *argv[]) {
 
     k_pu = generate_public_key(p, q, e, prime_size);
 
-    RSAEP_OAEP_encrypt(k_pu, octet_string, octet_string);
+    RSAEP_OAEP_encrypt(ciphertext_octet_string, k_pu, octet_string, length, octet_string, length);
 }
 
 // int main(int arc, char *argv[]) {
