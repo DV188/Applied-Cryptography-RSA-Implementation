@@ -14,7 +14,7 @@
 #include "RSA.h"
 #include "data_conversion_primatives.h"
 
-void RSAEP_OAEP_encrypt(
+void RSAES_OAEP_encrypt(
         unsigned int ciphertext_octet_string[],
         public_key k_pu,
         unsigned int message_octet_string[],
@@ -82,6 +82,47 @@ void RSAEP_OAEP_encrypt(
     RSAEP(c, m, k_pu);
 
     I2OSP(ciphertext_octet_string, c, mpz_sizeinbase(c, 10));
+}
+
+void RSAES_OAEP_decrypt(
+        unsigned int message_octet_string[],
+        private_key k_pr,
+        unsigned int ciphertext_octet_string[],
+        int ciphertext_octet_string_length,
+        unsigned int label_octet_string[],
+        int label_octet_string_length) {
+
+    mpz_t n, c, m;
+    mpz_init(n);
+    mpz_init(c);
+    mpz_init(m);
+
+    mpz_mul(n, k_pr.p, k_pr.q);
+
+    int modulus_length = mpz_sizeinbase(n, 10);
+    int hash_length = 40; //For SHA-1 the length of the hash created is 40 characters long.
+
+    mpz_t SHA_length_check;
+    mpz_init_set_ui(SHA_length_check, 2305843009213693951); //2^61 - 1
+
+    //Length Checking
+    if (mpz_cmp_ui(SHA_length_check, label_octet_string_length) < 0)
+        printf("Label octet string is too long for SHA-1.\n");
+
+    if (ciphertext_octet_string_length != modulus_length) {
+        printf("Decryption message octet string is too long.\n");
+        printf("%d > %d\n", ciphertext_octet_string_length, modulus_length);
+    }
+
+    if (modulus_length < 2*hash_length + 2)
+        printf("Decryption error\n");
+
+    //RSA Decryption
+    OS2IP(c, ciphertext_octet_string, ciphertext_octet_string_length);
+
+    RSADP(m, c, k_pr);
+
+    gmp_printf("%Zd\n", m);
 }
 
 void SHA1(mpz_t label_hash, unsigned int octet_string[]) {

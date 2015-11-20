@@ -57,7 +57,6 @@ exit:
     return result;
 }
 
-
 int miller_rabin(mpz_t n, gmp_randstate_t rand_state) {
     mpz_t a;
     int repeat;

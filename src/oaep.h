@@ -11,11 +11,19 @@
 
 #include "key_generation.h" 
 
-void RSAEP_OAEP_encrypt(
+void RSAES_OAEP_encrypt(
         unsigned int ciphertext_octet_string[],
         public_key k_pu,
         unsigned int message_octet_string[],
         int message_octet_string_length,
+        unsigned int label_octet_string[],
+        int label_octet_string_length);
+
+void RSAES_OAEP_decrypt(
+        unsigned int message_octet_string[],
+        private_key k_pr,
+        unsigned int ciphertext_octet_string[],
+        int ciphertext_octet_string_length,
         unsigned int label_octet_string[],
         int label_octet_string_length);
 
