@@ -6,11 +6,12 @@
  * December 2015
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "data_conversion_primatives.h"
 
-int I2OSP(unsigned int octet_str[], mpz_t i, unsigned long length) {
+int I2OSP(unsigned int octet_string[], mpz_t i, unsigned long length) {
     int index_c = 0;
     mpz_t len_test, tmp_byte;
     mpz_init(len_test);
@@ -22,28 +23,34 @@ int I2OSP(unsigned int octet_str[], mpz_t i, unsigned long length) {
 
     while (mpz_cmp_ui(i, 0) > 0) {
         mpz_mod_ui(tmp_byte, i, 256);
-        octet_str[length - 1 - index_c] = mpz_get_ui(tmp_byte);
+        octet_string[length - 1 - index_c] = mpz_get_ui(tmp_byte);
         mpz_fdiv_q_ui(i, i, 256);
 
         index_c++;
     }
 
-    memset(octet_str, 0x00, length - index_c);
+    memset(octet_string, 0x00, length - index_c);
 
     return(0);
 }
 
-int OS2IP(mpz_t i, unsigned int octet_str[], int length) {
+int OS2IP(mpz_t i, unsigned int octet_string[], int length) {
     mpz_t tmp_shift, tmp_mul;
     mpz_init(tmp_shift);
     mpz_init(tmp_mul);
 
     for (int j = length - 1; j >= 0; j--) {
         mpz_ui_pow_ui(tmp_shift, 256, length - 1 - j);
-        mpz_mul_ui(tmp_mul, tmp_shift, octet_str[j]);
+        mpz_mul_ui(tmp_mul, tmp_shift, octet_string[j]);
         mpz_add(i, i, tmp_mul);
     }
 
     return 0;
 }
 
+void print_octet_string(unsigned int *octet_string, int octet_string_length) {
+    for (int i = 0; i < octet_string_length; i++)
+        printf("%d ", octet_string[i]);
+
+    printf("\n");
+}

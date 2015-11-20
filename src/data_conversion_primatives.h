@@ -11,7 +11,9 @@
 
 #include <gmp.h>
 
-int I2OSP(unsigned int octet_str[], mpz_t i, unsigned long length);
-int OS2IP(mpz_t i, unsigned int octet_str[], int length);
+int I2OSP(unsigned int octet_string[], mpz_t i, unsigned long length);
+int OS2IP(mpz_t i, unsigned int octet_string[], int length);
+
+void print_octet_string(unsigned int *octet_string, int octet_string_length);
 
 #endif

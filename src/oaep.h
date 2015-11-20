@@ -12,5 +12,9 @@
 #include <gmp.h>
 #include "key_generation.h" 
 
+unsigned int RSAEP_OAEP_encrypt(
+        public_key k_pu,
+        unsigned int *message_octet_string,
+        unsigned int *label_octet_string);
 
 #endif

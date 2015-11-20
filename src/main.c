@@ -9,29 +9,31 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "oaep.h" 
 #include "data_conversion_primatives.h" 
-#include "RSA.h" 
 
 int main(int arc, char *argv[]) {
     mpz_t i;
     mpz_init_set_str(i, "505653012503429218243943633705672380046318162980074400525290686010978535210508251025371556786334751948415457926276892598751961027794016968235973613925881804782472056690499897096340749266251887257171654630228493856549694979043602485084236106517977998198816346622004351187096835097200490691844506811161067102443", 10);
+
     unsigned int length = mpz_sizeinbase(i, 10);
-    unsigned int octet_str[length];
-    memset(octet_str, 0, sizeof(octet_str));
+    unsigned int octet_string[length];
+    memset(octet_string, 0, sizeof(octet_string));
 
-    I2OSP(octet_str, i, length);
+    I2OSP(octet_string, i, length);
 
-    for (int j = 0; j < length; j++)
-        printf("%d ",octet_str[j]);
+    int prime_size = 513;
+    mpz_t p, q, e;
+    public_key k_pu;
 
-    printf("\n");
+    mpz_init(p);
+    mpz_init(q);
 
-    mpz_t tmp;
-    mpz_init(tmp);
+    mpz_init_set_ui(e, 65537);
 
-    OS2IP(tmp, octet_str, length);
+    k_pu = generate_public_key(p, q, e, prime_size);
 
-    gmp_printf("%Zd\n", tmp);
+    RSAEP_OAEP_encrypt(k_pu, octet_string, octet_string);
 }
 
 // int main(int arc, char *argv[]) {
