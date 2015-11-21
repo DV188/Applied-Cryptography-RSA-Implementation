@@ -108,10 +108,8 @@ void RSAES_OAEP_decrypt(
     if (mpz_cmp_ui(SHA_length_check, label_octet_string_length) < 0)
         printf("Label octet string is too long for SHA-1.\n");
 
-    if (ciphertext_octet_string_length != modulus_length) {
+    if (ciphertext_octet_string_length != modulus_length)
         printf("Decryption message octet string is too long.\n");
-        printf("%d > %d\n", ciphertext_octet_string_length, modulus_length);
-    }
 
     if (modulus_length < 2*hash_length + 2)
         printf("Decryption error\n");
@@ -120,6 +118,32 @@ void RSAES_OAEP_decrypt(
     OS2IP(c, ciphertext_octet_string, ciphertext_octet_string_length);
 
     RSADP(message, c, k_pr);
+
+    //EM = I2OSP(m, modulus_length);
+
+    //EME-OAEP Decoding
+
+    if (label_octet_string == NULL) {
+        mpz_t empty_string;
+        mpz_init(empty_string);
+
+        I2OSP(label_octet_string, empty_string, 1);
+    }
+
+    //Generate Label Hash
+    mpz_t label_hash;
+    mpz_init(label_hash);
+    SHA1(label_hash, label_octet_string);
+
+    //Separate encoded message EM
+    //EM = Y || masked_seed || masked_db;
+
+    //seed_mask = MGF(masked_db, hash_length);
+    //seed = XOR(masked_seed, db_mask);
+
+    //Separate Data Block
+    //DB = hash_length || PS || 0x01 || M;
+    //return(M);
 }
 
 void SHA1(mpz_t label_hash, unsigned int octet_string[]) {
