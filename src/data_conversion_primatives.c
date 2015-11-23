@@ -11,6 +11,15 @@
 
 #include "data_conversion_primatives.h"
 
+/*
+ * This function converts a big integer into an octet string representation.
+ * Parameters:
+ *      octet_string - buffer to which the octet string will be assigned
+ *      i - integer to be converted, big int
+ *      length - length of the octet string
+ * Returns:
+ *      Returns an octet string via the octet_string parameter.
+ */
 int I2OSP(unsigned int octet_string[], mpz_t i, unsigned long length) {
     int index_c = 0;
     mpz_t len_test, tmp_byte;
@@ -34,6 +43,15 @@ int I2OSP(unsigned int octet_string[], mpz_t i, unsigned long length) {
     return(0);
 }
 
+/*
+ * This function converts an octet string into a big int representation.
+ * Parameters:
+ *      i - big integer to be returned
+ *      octet_string - octet string to be converted into an integer
+ *      length - length of the octet string
+ * Returns:
+ *      Returns a big int via the i parameter.
+ */
 int OS2IP(mpz_t i, unsigned int octet_string[], int length) {
     mpz_t tmp_shift, tmp_mul;
     mpz_init(tmp_shift);
@@ -48,6 +66,14 @@ int OS2IP(mpz_t i, unsigned int octet_string[], int length) {
     return 0;
 }
 
+/*
+ * Prints and octet string, mostly for testing purposes.
+ * Parameters:
+ *      octet_string - octet string for which you would like printed
+ *      octet_string_length - length of the octet string
+ * Returns:
+ *      Prints octet string without returning a value.
+ */
 void print_octet_string(unsigned int *octet_string, int octet_string_length) {
     for (int i = 0; i < octet_string_length; i++)
         printf("%d ", octet_string[i]);

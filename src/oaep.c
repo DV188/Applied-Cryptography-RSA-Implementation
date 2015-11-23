@@ -14,6 +14,17 @@
 #include "RSA.h"
 #include "data_conversion_primatives.h"
 
+/* Encrypts a message using oaep padding combined with RSA encrypt.
+ * Parameters:
+ *      ciphertext_octet_string - buffer where the ciphertext will be stored in the form of a string octet
+ *      k_pu - RSA public key
+ *      message_octet_string - message that has been converted to its octet string representation
+ *      message_octet_string_length - length of the message octet string
+ *      label_octet_string - optional label whose association with the message is to be verified, octet string
+ *      label_octet_string_length - length of label octet string
+ * Returns:
+ *      Data is written to the ciphertext_octet_string in the form of an octet string.
+ */
 void RSAES_OAEP_encrypt(
         unsigned int ciphertext_octet_string[],
         public_key k_pu,
@@ -84,6 +95,17 @@ void RSAES_OAEP_encrypt(
     I2OSP(ciphertext_octet_string, c, mpz_sizeinbase(c, 10));
 }
 
+/* Decrypts a ciphertext that uses oaep padding and RSA decrypt.
+ * Parameters:
+ *      message - buffer for the big int representation of the message
+ *      k_pr - RSA private key using CRT
+ *      ciphertext_octet_string - ciphertext to decrypt in the form of an octet string
+ *      ciphertext_octet_string_length - length of the ciphertext octet string
+ *      label_octet_string - optional label whose association with the message is to be verified, octet string
+ *      label_octet_string_length - length of label octet string
+ * Returns:
+ *      Data is written to the message variable in the form of a big int.
+ */
 void RSAES_OAEP_decrypt(
         mpz_t message,
         private_key k_pr,
