@@ -84,7 +84,3 @@ void print_octet_string(unsigned int *octet_string, int octet_string_length) {
 
     printf("\n");
 }
-
-int length_octet_string(unsigned int *octet_string) {
-    return(sizeof(octet_string)/sizeof(octet_string[0]));
-}
