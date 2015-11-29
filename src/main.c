@@ -151,7 +151,5 @@ int main(int arc, char *argv[]) {
         printf("\n");
         printf("Finally, the cipher text is decrypted to give the following results:\n");
         gmp_printf("%Zd\n", message);
-
-        printf("%d\n", correct_answer);
     }
 }

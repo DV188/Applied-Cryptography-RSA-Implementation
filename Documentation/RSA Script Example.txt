@@ -1,0 +1,58 @@
+Script started on Sat Nov 28 23:51:53 2015
+[?1034hbash-3.2$ sh RSA.sh
+What size modulus would you like?
+2048
+What file would you like the private and public keys to be written to?
+privatepublickeys
+----------------------------------------------------------------------------------------------------
+Generating RSA private key, 2048 bit long modulus
+.....................................+++
+........................................+++
+e is 65537 (0x10001)
+
+writing RSA key
+----------------------------------------------------------------------------------------------------
+Files for your public/private key and just the public key have been created in this directory.
+
+total 24
+-rw-r--r--  1 Danen  staff  2084 28 Nov 23:46 RSA.sh
+-rw-r--r--  1 Danen  staff  1679 28 Nov 23:52 privatepublickeys.pem
+-rw-r--r--  1 Danen  staff   451 28 Nov 23:52 public.pem
+----------------------------------------------------------------------------------------------------
+Please input the message you would like encrypted:
+This is the message I would like to encrypt, important information.
+
+Your message has been written to message.txt.
+
+total 32
+-rw-r--r--  1 Danen  staff  2084 28 Nov 23:46 RSA.sh
+-rw-r--r--  1 Danen  staff    68 28 Nov 23:52 message.txt
+-rw-r--r--  1 Danen  staff  1679 28 Nov 23:52 privatepublickeys.pem
+-rw-r--r--  1 Danen  staff   451 28 Nov 23:52 public.pem
+----------------------------------------------------------------------------------------------------
+We can now encrypt your message found in message.txt:
+The encrypted message is stored in ciphertext.ssl.
+
+total 40
+-rw-r--r--  1 Danen  staff  2084 28 Nov 23:46 RSA.sh
+-rw-r--r--  1 Danen  staff   256 28 Nov 23:52 ciphertext.ssl
+-rw-r--r--  1 Danen  staff    68 28 Nov 23:52 message.txt
+-rw-r--r--  1 Danen  staff  1679 28 Nov 23:52 privatepublickeys.pem
+-rw-r--r--  1 Danen  staff   451 28 Nov 23:52 public.pem
+----------------------------------------------------------------------------------------------------
+Finally, the message can now be decrypted using the private key stored in the file specified earlier:
+
+total 48
+-rw-r--r--  1 Danen  staff  2084 28 Nov 23:46 RSA.sh
+-rw-r--r--  1 Danen  staff   256 28 Nov 23:52 ciphertext.ssl
+-rw-r--r--  1 Danen  staff    68 28 Nov 23:52 decrypted.txt
+-rw-r--r--  1 Danen  staff    68 28 Nov 23:52 message.txt
+-rw-r--r--  1 Danen  staff  1679 28 Nov 23:52 privatepublickeys.pem
+-rw-r--r--  1 Danen  staff   451 28 Nov 23:52 public.pem
+
+Your message:
+This is the message I would like to encrypt, important information.
+----------------------------------------------------------------------------------------------------
+bash-3.2$ exit
+
+Script done on Sat Nov 28 23:52:58 2015

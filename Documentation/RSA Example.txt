@@ -1,0 +1,107 @@
+Script started on Sat Nov 28 23:53:43 2015
+[?1034hbash-3.2$ make
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/main.o src/main.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/RSA.o src/RSA.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/miller-rabin.o src/miller-rabin.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/key_generation.o src/key_generation.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/data_conversion_primatives.o src/data_conversion_primatives.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+cc -I /usr/local/include -L /usr/local/lib -l gmp   -c -o src/oaep.o src/oaep.c
+clang: warning: -lgmp: 'linker' input unused
+clang: warning: argument unused during compilation: '-L/usr/local/lib'
+gcc -I /usr/local/include -L /usr/local/lib -l gmp ./src/main.o ./src/RSA.o ./src/miller-rabin.o ./src/key_generation.o ./src/data_conversion_primatives.o ./src/oaep.o -o RSA
+bash-3.2$ ./RSA
+----------------------------------------------------------------
+--------------  The RSA Public Key Cryptosystem   --------------
+----------------------------------------------------------------
+
+Please enter a interger value you would like to encrypt:
+427680787658796414495478412765818481773700031964971550032485995462094541318172071699678633526190831000613031464300541848882252073989630802044992230370499993349891121354055409063481101792420859297579606741599372692821291104228771117776673746157967849667351681259816188574800065511460953723930836865732656293632
+
+----------------------------------------------------------------
+
+Please enter the size of primes you would like to generate.
+Values are typically 512 or 1024 for an RSA modulus of size 1024 or 2048:
+512
+
+----------------------------------------------------------------
+
+For this demonstration, the public exponent e has been set to 65537.
+Where ed = 1 mod lambda(n), pkcs#1 v2.1
+
+----------------------------------------------------------------
+
+Generating the public key for your message:
+RSA modulus n = 554056939547130142923852451439706988139722628934158756342513679769314110788415450090513740611453169627478322160327315598228418764743644118769850159945083935895886173593157098557968261434849940997377993683216020482860499129927901511610093067594749913069036403498243972454580647539949007503411376666430117674743
+Public exponent e = 65537
+
+----------------------------------------------------------------
+
+Generating the private key for your message using large primes and the public exponent:
+CRT first factor p = 35984299001773772725388423698211755764527917758128310450174011247629033220113788294946691116533952715244471919478861480602045731049145777345283636266181637
+CRT second factor q = 15397185853747464543042473272134253340188681061339925322626816439176121046691920461473567155049795561472323492542321380172202274647220136387073286781985739
+First factor CRT exponent dP = 35731178446365107250520729673082811513075343333200450598219692020548803970766511849519368770306292733833548295344711990351385141122636230015436744337672401
+Second factor CRT exponent dQ = 2465682981141639690239570883486412084857106790648984791201434892185382156415943745413508205933253039010818851247870102154618961387042057637400768188610103
+CRT coefficient qInv = 4089454334749317982713769114396820578424788145356719259312594446154815767764206428049612197277186344160484292999490744668839450809009739371204696623994001
+
+----------------------------------------------------------------
+
+Converting your message into its octet string representation:
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       0][       0][       0][       0][       0][       0][       0][       0][       0][       0]
+[       2][      97][       9][     163][     242][      10][     174][     234][     223][     244]
+[     207][      36][     190][      85][     127][     171][     136][     150][      76][      87]
+[      45][     140][     225][      28][     211][      83][     101][     114][     109][     223]
+[     160][     136][      58][     178][     106][       7][      51][      53][     202][     213]
+[      96][     101][      32][     243][     205][     244][     119][     169][      68][     120]
+[       2][      37][     112][     149][      85][     135][      97][     253][      55][     242]
+[      21][     196][      53][     197][      54][     153][      15][     156][     162][      25]
+[     131][     172][     234][      61][      68][     114][     122][     209][      92][     162]
+[      40][      13][      25][     147][     112][     171][     195][     142][       6][     103]
+[      13][     188][     247][     242][     132][     211][     235][     219][     233][     206]
+[      61][     242][      30][     174][      64][      96][      49][      59][      41][     223]
+[     228][      13][      69][     227][     137][     218][      75][     150][     172][      29]
+[     199][       7][      30][     106][     153][     255][     212][     231][       0]
+
+----------------------------------------------------------------
+
+Using this octet string, we will run RSA to encrypt the message.
+The ciphertext produced is as follows:
+475804329664503670118296739761406623126345429391374315665947687526066230380998082297741365404160121299583981331195903146974156521040010951225067285145174729988542693763133792161447902772472042580091200977277292060651468011931728841620782939576337095355583392821496698124125734148899296011183447775848266895245
+
+----------------------------------------------------------------
+
+This ciphertext is again converted into an octet string to pad before being passed to the decrypter.
+
+----------------------------------------------------------------
+
+Finally, the cipher text is decrypted to give the following results:
+427680787658796414495478412765818481773700031964971550032485995462094541318172071699678633526190831000613031464300541848882252073989630802044992230370499993349891121354055409063481101792420859297579606741599372692821291104228771117776673746157967849667351681259816188574800065511460953723930836865732656293632
+bash-3.2$ exit
+
+Script done on Sat Nov 28 23:55:01 2015
