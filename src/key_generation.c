@@ -95,7 +95,8 @@ private_key set_private_key(const mpz_t p, const mpz_t q, const mpz_t dP, const 
  *      k_pu - struct public_key representing the public key
  */
 void print_public_key(public_key k_pu) {
-    gmp_printf("Public Key:\n(%Zd,\n %Zd)\n", k_pu.n, k_pu.e);
+    gmp_printf("RSA modulus n = %Zd\n", k_pu.n);
+    gmp_printf("Public exponent e = %Zd\n", k_pu.e);
 }
 
 /*
@@ -104,7 +105,11 @@ void print_public_key(public_key k_pu) {
  *      k_pr - struct private_key representing the private key.
  */
 void print_private_key(private_key k_pr) {
-    gmp_printf("Private Key:\n(%Zd,\n %Zd,\n %Zd,\n %Zd,\n %Zd)\n", k_pr.p, k_pr.q, k_pr.dP, k_pr.dQ, k_pr.qInv);
+    gmp_printf("CRT first factor p = %Zd\n", k_pr.p);
+    gmp_printf("CRT second factor q = %Zd\n", k_pr.q);
+    gmp_printf("First factor CRT exponent dP = %Zd\n", k_pr.dP);
+    gmp_printf("Second factor CRT exponent dQ = %Zd\n", k_pr.dQ);
+    gmp_printf("CRT coefficient qInv = %Zd\n", k_pr.qInv);
 }
 
 /*

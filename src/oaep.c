@@ -47,10 +47,9 @@ void RSAES_OAEP_encrypt(
     if (mpz_cmp_ui(SHA_length_check, label_octet_string_length) < 0)
         printf("Label octet string is too long for SHA-1.\n");
 
-    if (message_octet_string_length > modulus_length - 2*hash_length - 2) {
-        printf("Message octet string is too long.\n");
-        printf("%d > %d\n", message_octet_string_length, modulus_length - 2*hash_length - 2);
-    }
+    // if (message_octet_string_length > modulus_length - 2*hash_length - 2) {
+    //     printf("Message octet string is too long.\n");
+    // }
 
     //EME-OAEP Encoding
     if (label_octet_string == NULL) {
@@ -65,15 +64,15 @@ void RSAES_OAEP_encrypt(
     mpz_init(label_hash);
     SHA1(label_hash, label_octet_string);
 
-    //Generate PS octet string
-    mpz_t PS_value;
-    mpz_init(PS_value);
+    // //Generate PS octet string
+    // mpz_t PS_value;
+    // mpz_init(PS_value);
 
-    unsigned int PS_length = modulus_length - message_octet_string_length - 2*hash_length - 2;
-    unsigned int PS_octet_string[PS_length];
-    memset(PS_octet_string, 0, sizeof(PS_octet_string));
+    // unsigned int PS_length = modulus_length - message_octet_string_length - 2*hash_length - 2;
+    // unsigned int PS_octet_string[PS_length];
+    // memset(PS_octet_string, 0, sizeof(PS_octet_string));
 
-    I2OSP(PS_octet_string, PS_value, PS_length);
+    // I2OSP(PS_octet_string, PS_value, PS_length);
 
     //Concatenate Data Block
     //data_block = hash_length || PS || 0x01 || message_octet_string;
@@ -92,7 +91,9 @@ void RSAES_OAEP_encrypt(
 
     RSAEP(c, m, k_pu);
 
-    I2OSP(ciphertext_octet_string, c, mpz_sizeinbase(c, 10));
+    int size_c = mpz_sizeinbase(c, 10);
+
+    I2OSP(ciphertext_octet_string, c, size_c);
 }
 
 /* Decrypts a ciphertext that uses oaep padding and RSA decrypt.
@@ -137,8 +138,6 @@ void RSAES_OAEP_decrypt(
         printf("Decryption error\n");
 
     //RSA Decryption
-    OS2IP(c, ciphertext_octet_string, ciphertext_octet_string_length);
-
     RSADP(message, c, k_pr);
 
     //EM = I2OSP(m, modulus_length);

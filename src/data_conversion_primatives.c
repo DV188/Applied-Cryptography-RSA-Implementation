@@ -26,14 +26,14 @@ int I2OSP(unsigned int octet_string[], mpz_t i, unsigned long length) {
     mpz_init(len_test);
     mpz_init(tmp_byte);
 
-    mpz_ui_pow_ui(len_test, 256, length);
+    mpz_ui_pow_ui(len_test, 256LU, length);
     if (mpz_cmp(i, len_test) >= 0)
         return(1);
 
     while (mpz_cmp_ui(i, 0) > 0) {
-        mpz_mod_ui(tmp_byte, i, 256);
+        mpz_mod_ui(tmp_byte, i, 256LU);
         octet_string[length - 1 - index_c] = mpz_get_ui(tmp_byte);
-        mpz_fdiv_q_ui(i, i, 256);
+        mpz_fdiv_q_ui(i, i, 256LU);
 
         index_c++;
     }
@@ -75,8 +75,16 @@ int OS2IP(mpz_t i, unsigned int octet_string[], int length) {
  *      Prints octet string without returning a value.
  */
 void print_octet_string(unsigned int *octet_string, int octet_string_length) {
-    for (int i = 0; i < octet_string_length; i++)
-        printf("%d ", octet_string[i]);
+    for (int i = 0; i < octet_string_length; i++) {
+        printf("[%8d]", octet_string[i]);
+
+        if ((i + 1)%10 == 0)
+            printf("\n");
+    }
 
     printf("\n");
+}
+
+int length_octet_string(unsigned int *octet_string) {
+    return(sizeof(octet_string)/sizeof(octet_string[0]));
 }

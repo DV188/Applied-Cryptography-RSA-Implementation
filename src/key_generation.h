@@ -33,7 +33,7 @@ typedef struct private_key {
     mpz_t q; //Second factor, a positive integer.
     mpz_t dP; //First factor CRT exponent, positive integer.
     mpz_t dQ; //Second factor CRT exponent, positive integer.
-    mpz_t qInv; //(first) CRT exponent, positive integer.
+    mpz_t qInv; //(first) CRT coefficient, positive integer.
 } private_key;
 
 //Function Prototypes
