@@ -22,11 +22,16 @@
  * Returns:
  *      Ciphertext for a message is returned in the mpz_t s variable.
  */
-void RSAEP(mpz_t c,  const mpz_t m, const public_key k_pu) {
-    if (mpz_sizeinbase(m, 2) > mpz_sizeinbase(k_pu.n, 2))
-        printf("Message representative out of range.\n");
+int RSAEP(mpz_t c,  const mpz_t m, const public_key k_pu) {
+    int return_code = 1;
+
+    if (mpz_sizeinbase(m, 2) > mpz_sizeinbase(k_pu.n, 2)) {
+        return_code = 0;
+    }
 
     mpz_powm(c, m, k_pu.e, k_pu.n);
+
+    return return_code;
 }
 
 /*
@@ -54,7 +59,7 @@ void RSADP_texbook(mpz_t m, const mpz_t c, const private_key_textbook k_pr) {
  * Returns:
  *      Plaintext message is returned in the mpz_t value m.
  */
-void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
+int RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
     mpz_t n, m_1, m_2, h, h_1, h_2, h_3;
     mpz_init(n);
     mpz_init(m_1);
@@ -64,11 +69,13 @@ void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
     mpz_init(h_2);
     mpz_init(h_3);
 
+    int return_code = 1;
+
     mpz_mul(n, k_pr.q, k_pr.p);
 
-    if (mpz_sizeinbase(c, 2) > mpz_sizeinbase(n, 2))
-        printf("Ciphertext representative out of range.\n");
-
+    if (mpz_sizeinbase(c, 2) > mpz_sizeinbase(n, 2)) {
+        return_code = 0;
+    }
     
     mpz_powm(m_1, c, k_pr.dP, k_pr.p);
     mpz_powm(m_2, c, k_pr.dQ, k_pr.q);
@@ -79,4 +86,6 @@ void RSADP(mpz_t m, const mpz_t c, const private_key k_pr) {
 
     mpz_mul(h_3, k_pr.q, h);
     mpz_add(m, m_2, h_3);
+
+    return return_code;
 }

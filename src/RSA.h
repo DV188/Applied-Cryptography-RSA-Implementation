@@ -12,8 +12,8 @@
 #include <gmp.h>
 #include "key_generation.h" 
 
-void RSAEP(mpz_t c, const mpz_t m, const public_key k_pu);
+int RSAEP(mpz_t c, const mpz_t m, const public_key k_pu);
 void RSADP_texbook(mpz_t m, const mpz_t c, const private_key_textbook k_pr);
-void RSADP(mpz_t m, const mpz_t c, const private_key k_pr);
+int RSADP(mpz_t m, const mpz_t c, const private_key k_pr);
 
 #endif
