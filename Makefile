@@ -1,5 +1,6 @@
 FILEPATH=./src/
-CFLAGS=-I /usr/local/include -L /usr/local/lib -l gmp
+#CFLAGS=-I /usr/local/include -L /usr/local/lib -l gmp
+CFLAGS=-I ./gmplib/include/ -L ./gmplib/lib -l gmp
 
 all: main
 
