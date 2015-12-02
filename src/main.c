@@ -111,7 +111,6 @@ int main(int arc, char *argv[]) {
             printf("%s\n", continue_response);
 
             if (strcmp(continue_response, yes) == 0) {
-                printf("here\n");
                 correct_answer = 0;
             }
         }
@@ -140,7 +139,6 @@ int main(int arc, char *argv[]) {
             printf("%s\n", continue_response);
 
             if (strcmp(continue_response, yes) == 0) {
-                printf("here\n");
                 correct_answer = 0;
             }
         }
