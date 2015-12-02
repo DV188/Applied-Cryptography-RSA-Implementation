@@ -28,6 +28,9 @@ echo ""
 
 ls -l #List files in directory.
 
+cat public.pem
+cat $keyfile.pem
+
 echo "----------------------------------------------------------------------------------------------------"
 
 echo "Please input the message you would like encrypted:"
